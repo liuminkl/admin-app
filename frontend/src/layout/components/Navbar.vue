@@ -40,7 +40,7 @@
   </div>
 
   <!-- 修改密码对话框 -->
-  <el-dialog v-model="pwdVisible" title="修改密码" width="420px">
+  <el-dialog v-model="pwdVisible" title="修改密码" width="420px" append-to-body>
     <el-form ref="pwdFormRef" :model="pwdForm" :rules="pwdRules" label-width="80px">
       <el-form-item label="原密码" prop="oldPassword">
         <el-input v-model="pwdForm.oldPassword" type="password" show-password />

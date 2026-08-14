@@ -152,6 +152,14 @@ admin-app/
 
 ## 6. 容器化部署
 
+> **本地开发容器运行时**：开发机使用 [Colima](https://github.com/abiosoft/colima)（macOS 轻量容器运行时）承载所有 `docker` / `docker compose` 命令，无需安装 Docker Desktop。启动方式：
+>
+> ```bash
+> brew install colima docker docker-compose
+> colima start
+> docker context use colima
+> ```
+
 | 服务 | 镜像 | 端口 | 说明 |
 |------|------|------|------|
 | frontend | admin-frontend | 80 | Nginx + 构建产物，反代 /api |

@@ -77,14 +77,25 @@ docker compose ps
 
 ### 方式二：本地开发
 
+> **容器运行时**：本地开发环境使用 [Colima](https://github.com/abiosoft/colima)（macOS 轻量容器运行时，无需 Docker Desktop）。首次使用需安装并启动：
+>
+> ```bash
+> brew install colima docker docker-compose
+> colima start                # 启动 colima 虚拟机
+> docker context use colima   # 将 Docker CLI 指向 colima
+> ```
+>
+> 之后所有 `docker` / `docker compose` 命令均经由 colima 执行。
+
 #### 前置依赖
 - Node.js 18+
-- PostgreSQL 14+
-- Redis 6+
+- Colima（启动并运行中的容器运行时）
+- PostgreSQL 14+（可通过下方 docker compose 提供，无需本机安装）
+- Redis 6+（可通过下方 docker compose 提供，无需本机安装）
 
-#### 1. 启动数据库
+#### 1. 启动数据库（经 colima 运行）
 ```bash
-# 本地需自行安装 PostgreSQL 和 Redis，或：
+# 本地无需自行安装 PostgreSQL 和 Redis，直接经 colima 启动：
 docker compose up -d postgres redis
 ```
 
