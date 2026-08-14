@@ -1,0 +1,110 @@
+// Prisma schema 定义
+// 数据源：PostgreSQL
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========== 用户 ==========
+model User {
+  id           Int             @id @default(autoincrement())
+  username     String          @unique @db.VarChar(50)
+  password     String          @db.VarChar(100)
+  nickname     String?         @db.VarChar(50)
+  email        String?         @db.VarChar(100)
+  phone        String?         @db.VarChar(20)
+  avatar       String?         @db.VarChar(255)
+  status       Int             @default(1) // 1启用 0禁用
+  isSuper      Boolean         @default(false) @map("is_super")
+  remark       String?         @db.VarChar(255)
+  lastLoginAt  DateTime?       @map("last_login_at")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  roles        UserRole[]
+  logs         OperationLog[]
+
+  @@map("users")
+}
+
+// ========== 角色 ==========
+model Role {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique @db.VarChar(50)
+  code        String       @unique @db.VarChar(50)
+  description String?      @db.VarChar(255)
+  status      Int          @default(1)
+  sort        Int          @default(0)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  users       UserRole[]
+  menus       RoleMenu[]
+
+  @@map("roles")
+}
+
+// ========== 菜单/权限 ==========
+model Menu {
+  id        Int         @id @default(autoincrement())
+  parentId  Int         @default(0) @map("parent_id")
+  name      String      @db.VarChar(50)
+  path      String?     @db.VarChar(255)
+  component String?     @db.VarChar(255)
+  type      Int         @default(1) // 1目录 2菜单 3按钮
+  icon      String?     @db.VarChar(100)
+  sort      Int         @default(0)
+  status    Int         @default(1)
+  perms     String?     @db.VarChar(100) // 权限标识 system:user:add
+  visible   Int         @default(1) // 1显示 0隐藏
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+  roles     RoleMenu[]
+
+  @@map("menus")
+}
+
+// ========== 用户-角色 关联 ==========
+model UserRole {
+  userId Int   @map("user_id")
+  roleId Int   @map("role_id")
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role  @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+// ========== 角色-菜单 关联 ==========
+model RoleMenu {
+  roleId Int  @map("role_id")
+  menuId Int  @map("menu_id")
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu   Menu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, menuId])
+  @@map("role_menus")
+}
+
+// ========== 操作日志 ==========
+model OperationLog {
+  id        Int       @id @default(autoincrement())
+  userId    Int?      @map("user_id")
+  user      User?     @relation(fields: [userId], references: [id])
+  username  String?   @db.VarChar(50)
+  module    String?   @db.VarChar(50)
+  action    String?   @db.VarChar(100)
+  method    String?   @db.VarChar(10)
+  url       String?   @db.VarChar(255)
+  params    String?   @db.Text
+  ip        String?   @db.VarChar(50)
+  status    Int       @default(0) // 0成功 1失败
+  costTime  Int?      @map("cost_time")
+  errorMsg  String?   @db.Text @map("error_msg")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("operation_logs")
+}
